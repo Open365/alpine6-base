@@ -1,3 +1,8 @@
 #!/bin/sh
 
-apk del curl make gcc g++ git python
+extraPack="";
+if [ "$#" -ge "0" ]; then
+    extraPack=$@;
+fi
+
+apk del curl make gcc g++ git python $extraPack

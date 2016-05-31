@@ -1,12 +1,63 @@
 #!/bin/sh
 
 usage() {
-    echo "$0 [--develop|--production] [-i|--install] [-p|--purgue] -c=<package_common> --deps=<list_dependencies>"
+    echo "$0 [--develop|--production] [-i|--install] [-p|--purgue] -s=<name_microservice>"
     echo " --develop, --production: type of script to use in the install or purgue, environment develop or production"
     echo " -i, --install:           install packages"
     echo " -p, --purgue:            purgue packages"
-    echo " -c, --common:            value 'true' o 'false', install common packages"
-    echo " --deps, --dependencies:  list of differents packages to install or purgue, separate by a whitespace as a string"
+    echo " -s, --service:           microservice's name"
+}
+
+chargeProductionListDependencies() {
+    if [ $1 == true ]; then
+        source /scripts-base/dependencies-extra.list
+    fi
+}
+
+chargeDevelopListDependencies() {
+    if [ $1 == true ]; then
+        source /scripts-base/dependencies-dev.list
+    fi
+}
+
+setNameMicroService() {
+    if [ $1 == false ]; then
+        nameservice=$WHATAMI
+    fi
+}
+
+executeInstall() {
+    if [ $2 == true ]; then
+        service="add$1"
+        eval dependencies=\$$service
+        if [ ${#dependencies} -gt 0 ]; then
+            if [ $3 == true ]; then
+                /scripts-base/installExtraBuild.sh $dependencies
+            fi
+            if [ $4 == true ]; then
+                /scripts-base/installDevBuild.sh $dependencies
+            fi
+        else
+            echo "Error dependencies doesn't available"
+        fi
+    fi
+}
+
+executePurgue() {
+    if [ $2 == true ]; then
+        service="del$1"
+        eval dependencies=\$$service
+        if [ ${#dependencies} -gt 0 ]; then
+            if [ $3 == true ]; then
+                /scripts-base/deleteExtraBuild.sh $dependencies
+            fi
+            if [ $4 == true ]; then
+                /scripts-base/deleteDevBuild.sh $dependencies
+            fi
+        else
+            echo "Error dependencies doesn't available"
+        fi
+    fi
 }
 
 if [ "$#" -eq 0 ]
@@ -17,11 +68,9 @@ fi
 
 develop=false
 production=false
-install=false
 purgue=false
-common=false
-dependecies=""
-existDepends=false
+service=false
+nameservice=""
 
 for i in "$@"
 do
@@ -46,53 +95,19 @@ do
         purgue=true
         shift
         ;;
-        -c=*|--common=*)
-        common="${i#*=}"
-        if [ "$common" != "true" ] && [ "$common" != "false" ]
-        then
-            usage
-            exit
-        fi
-        if [ "$common" == "true" ]
-        then
-            common=true
-        else
-            common=false
-        fi
-        shift
-        ;;
-        --deps=*|--dependencies=*)
-        existDepends=true
-        dependencies="${i#*=}"
+        -s=*|--service=*)
+        service=true
+        nameservice="${i#*=}"
         shift
         ;;
     esac
 done
 
-if [ $common == true ]; then
-    if [ $install == true ]; then
-        if [ $production == true ]; then
-            /scripts-base/installExtraBuild.sh $dependencies
-        fi
-        if [ $develop == true ]; then
-            /scripts-base/installDevBuild.sh $dependencies
-        fi
-    fi
-    if [ $purgue == true ]; then
-        if [ $production == true ]; then
-            /scripts-base/deleteExtraBuild.sh $dependencies
-        fi
-        if [ $develop == true ]; then
-            /scripts-base/deleteDevBuild.sh $dependencies
-        fi
-    fi
-else
-    if [ $existDepends == true ]; then
-        if [ $install == true ]; then
-            apk add --no-cache $dependencies
-        fi
-        if [ $purgue == true ]; then
-            apk del $dependencies
-        fi
-    fi
-fi
+chargeProductionListDependencies $production
+chargeDevelopListDependencies $develop
+setNameMicroService $service
+
+service="${nameservice//-}"
+
+executeInstall $service $install $production $develop
+executePurgue $service $purgue $production $develop

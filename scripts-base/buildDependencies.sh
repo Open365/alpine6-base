@@ -1,40 +1,35 @@
 #!/bin/sh
 
 usage() {
-    echo "$0 [--develop|--production] [-i|--install] [-p|--purgue] -s=<name_microservice>"
+    echo "$0 [--develop|--production] [-i|--install] [-p|--purgue]"
     echo " --develop, --production: type of script to use in the install or purgue, environment develop or production"
     echo " -i, --install:           install packages"
     echo " -p, --purgue:            purgue packages"
-    echo " -s, --service:           microservice's name"
 }
 
 chargeProductionListDependencies() {
     if [ $1 == true ]; then
-        source /scripts-base/dependencies-extra.list
+        source /var/service/dependencies-extra.list
+        source /var/service/alpine-dependencies-extra.list
     fi
 }
 
 chargeDevelopListDependencies() {
     if [ $1 == true ]; then
-        source /scripts-base/dependencies-dev.list
-    fi
-}
-
-setNameMicroService() {
-    if [ $1 == false ]; then
-        nameservice=$WHATAMI
+        source /var/service/dependencies-dev.list
+        source /var/service/alpine-dependencies-dev.list
     fi
 }
 
 executeInstall() {
-    if [ $2 == true ]; then
-        service="add$1"
+    if [ $1 == true ]; then
+        service="add"
         eval dependencies=\$$service
         if [ ${#dependencies} -gt 0 ]; then
-            if [ $3 == true ]; then
+            if [ $2 == true ]; then
                 /scripts-base/installExtraBuild.sh $dependencies
             fi
-            if [ $4 == true ]; then
+            if [ $3 == true ]; then
                 /scripts-base/installDevBuild.sh $dependencies
             fi
         else
@@ -44,14 +39,14 @@ executeInstall() {
 }
 
 executePurgue() {
-    if [ $2 == true ]; then
-        service="del$1"
+    if [ $1 == true ]; then
+        service="del"
         eval dependencies=\$$service
         if [ ${#dependencies} -gt 0 ]; then
-            if [ $3 == true ]; then
+            if [ $2 == true ]; then
                 /scripts-base/deleteExtraBuild.sh $dependencies
             fi
-            if [ $4 == true ]; then
+            if [ $3 == true ]; then
                 /scripts-base/deleteDevBuild.sh $dependencies
             fi
         else
@@ -69,8 +64,6 @@ fi
 develop=false
 production=false
 purgue=false
-service=false
-nameservice=""
 
 for i in "$@"
 do
@@ -95,19 +88,11 @@ do
         purgue=true
         shift
         ;;
-        -s=*|--service=*)
-        service=true
-        nameservice="${i#*=}"
-        shift
-        ;;
     esac
 done
 
 chargeProductionListDependencies $production
 chargeDevelopListDependencies $develop
-setNameMicroService $service
 
-service="${nameservice//-}"
-
-executeInstall $service $install $production $develop
-executePurgue $service $purgue $production $develop
+executeInstall $install $production $develop
+executePurgue $purgue $production $develop

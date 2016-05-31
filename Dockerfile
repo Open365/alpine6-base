@@ -1,6 +1,7 @@
 FROM mhart/alpine-node:6.2
 
-COPY scripts-base/* scripts-base/
+COPY scripts-base/*.sh scripts-base/
+COPY scripts-base/*.list /var/service/
 
 RUN chmod +x scripts-base/* && \
     apk update && \

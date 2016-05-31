@@ -5,4 +5,4 @@ if [ "$#" -ge "0" ]; then
     extraPack=$@;
 fi
 
-apk del $extraPack
+apk del curl make gcc g++ git python $extraPack

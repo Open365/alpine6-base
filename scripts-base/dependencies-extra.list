@@ -1,4 +1,7 @@
+# Common packages
 common="curl make gcc g++ git python"
+
+# Install packages to images docker
 addalpineBase="$common dnsmasq"
 addapplication="$common"
 addcamel="$common"
@@ -16,6 +19,7 @@ addwebsockify="$common"
 addproxy="nginx"
 addseafileServer=""
 
+# Delete packages to images docker
 delalpineBase="$common"
 delapplication="$common"
 delcamel="$common"

@@ -33,7 +33,7 @@ executeInstall() {
                 /scripts-base/installDevBuild.sh $dependencies
             fi
         else
-            echo "Error dependencies doesn't available"
+            echo "Dependencies doesn't available"
         fi
     fi
 }
@@ -50,7 +50,7 @@ executePurgue() {
                 /scripts-base/deleteDevBuild.sh $dependencies
             fi
         else
-            echo "Error dependencies doesn't available"
+            echo "Dependencies doesn't available"
         fi
     fi
 }

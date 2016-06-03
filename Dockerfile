@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:6.2
+FROM mhart/alpine-node:6.2.0
 
 COPY scripts-base/*.sh scripts-base/
 COPY scripts-base/*.list /var/service/

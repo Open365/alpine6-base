@@ -29,7 +29,7 @@ executeInstall() {
         eval dependencies=\$$service
         if [ ${#dependencies} -gt 0 ]; then
             if [ $2 == true ]; then
-                /scripts-base/installExtraBuild-new.sh $dependencies
+                /scripts-base/installExtraBuild.sh $dependencies
             fi
             if [ $3 == true ]; then
                 /scripts-base/installDevBuild.sh $dependencies
@@ -46,7 +46,7 @@ executePurgue() {
         eval dependencies=\$$service
         if [ ${#dependencies} -gt 0 ]; then
             if [ $2 == true ]; then
-                /scripts-base/deleteExtraBuild-new.sh $dependencies
+                /scripts-base/deleteExtraBuild.sh $dependencies
             fi
             if [ $3 == true ]; then
                 /scripts-base/deleteDevBuild.sh $dependencies

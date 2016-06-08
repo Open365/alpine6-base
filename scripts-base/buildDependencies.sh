@@ -11,14 +11,14 @@ usage() {
 
 chargeProductionListDependencies() {
     if [ $1 == true ]; then
-        source "$InstallationDir"/dependencies-extra.list
+        source "$BaseInstallationDir"/dependencies-extra.list
         source "$InstallationDir"/alpine-dependencies-extra.list
     fi
 }
 
 chargeDevelopListDependencies() {
     if [ $1 == true ]; then
-        source "$InstallationDir"/dependencies-dev.list
+        source "$BaseInstallationDir"/dependencies-dev.list
         source "$InstallationDir"/alpine-dependencies-dev.list
     fi
 }

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+InstallationDir="${InstallationDir:-/var/service}"
+
 usage() {
     echo "$0 [--develop|--production] [-i|--install] [-p|--purgue]"
     echo " --develop, --production: type of script to use in the install or purgue, environment develop or production"
@@ -9,15 +11,15 @@ usage() {
 
 chargeProductionListDependencies() {
     if [ $1 == true ]; then
-        source /var/service/dependencies-extra.list
-        source /var/service/alpine-dependencies-extra.list
+        source "$InstallationDir"/dependencies-extra.list
+        source "$InstallationDir"/alpine-dependencies-extra.list
     fi
 }
 
 chargeDevelopListDependencies() {
     if [ $1 == true ]; then
-        source /var/service/dependencies-dev.list
-        source /var/service/alpine-dependencies-dev.list
+        source "$InstallationDir"/dependencies-dev.list
+        source "$InstallationDir"/alpine-dependencies-dev.list
     fi
 }
 

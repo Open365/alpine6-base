@@ -1,5 +1,7 @@
 #!/bin/sh
 
+InstallationDir="${InstallationDir:-/var/service}"
+
 usage() {
     echo "$0 [--develop|--production] [-i|--install] [-p|--purgue]"
     echo " --develop, --production: type of script to use in the install or purgue, environment develop or production"
@@ -9,15 +11,14 @@ usage() {
 
 chargeProductionListDependencies() {
     if [ $1 == true ]; then
-        source /var/service/dependencies-extra.list
-        source /var/service/alpine-dependencies-extra.list
+        source "$BaseInstallationDir"/dependencies-extra.list
+        source "$InstallationDir"/alpine-dependencies-extra.list
     fi
 }
 
 chargeDevelopListDependencies() {
     if [ $1 == true ]; then
-        source /var/service/dependencies-dev.list
-        source /var/service/alpine-dependencies-dev.list
+        source "$InstallationDir"/alpine-dependencies-dev.list
     fi
 }
 
@@ -27,7 +28,7 @@ executeInstall() {
         eval dependencies=\$$service
         if [ ${#dependencies} -gt 0 ]; then
             if [ $2 == true ]; then
-                /scripts-base/installExtraBuild-new.sh $dependencies
+                /scripts-base/installExtraBuild.sh $dependencies
             fi
             if [ $3 == true ]; then
                 /scripts-base/installDevBuild.sh $dependencies
@@ -44,7 +45,7 @@ executePurgue() {
         eval dependencies=\$$service
         if [ ${#dependencies} -gt 0 ]; then
             if [ $2 == true ]; then
-                /scripts-base/deleteExtraBuild-new.sh $dependencies
+                /scripts-base/deleteExtraBuild.sh $dependencies
             fi
             if [ $3 == true ]; then
                 /scripts-base/deleteDevBuild.sh $dependencies

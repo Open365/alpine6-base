@@ -1,7 +1,9 @@
 FROM mhart/alpine-node:6.2.0
 
+ENV BaseInstallationDir /var/service
+
 COPY scripts-base/*.sh scripts-base/
-COPY scripts-base/*.list /var/service/
+COPY scripts-base/*.list ${BaseInstallationDir}/
 
 RUN chmod +x scripts-base/* && \
     apk update && \

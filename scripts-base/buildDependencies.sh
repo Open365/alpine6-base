@@ -18,7 +18,6 @@ chargeProductionListDependencies() {
 
 chargeDevelopListDependencies() {
     if [ $1 == true ]; then
-        source "$BaseInstallationDir"/dependencies-dev.list
         source "$InstallationDir"/alpine-dependencies-dev.list
     fi
 }

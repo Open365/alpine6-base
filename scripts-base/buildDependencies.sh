@@ -9,49 +9,32 @@ usage() {
     echo " -p, --purgue:            purgue packages"
 }
 
-chargeProductionListDependencies() {
-    if [ $1 == true ]; then
-        source "$BaseInstallationDir"/dependencies-extra.list
-        source "$InstallationDir"/alpine-dependencies-extra.list
-    fi
-}
+chargeListDependencies() {
+    local is_develop=$1
 
-chargeDevelopListDependencies() {
-    if [ $1 == true ]; then
+    source /scripts-base/dependencies.list
+    source "$InstallationDir"/alpine-dependencies-extra.list
+    if [ $is_develop == true ]; then
         source "$InstallationDir"/alpine-dependencies-dev.list
     fi
 }
 
 executeInstall() {
-    if [ $1 == true ]; then
-        service="add"
-        eval dependencies=\$$service
-        if [ ${#dependencies} -gt 0 ]; then
-            if [ $2 == true ]; then
-                /scripts-base/installExtraBuild.sh $dependencies
-            fi
-            if [ $3 == true ]; then
-                /scripts-base/installDevBuild.sh $dependencies
-            fi
-        else
-            echo "Dependencies doesn't available"
+    local is_install=$1
+
+    if [ $is_install == true ]; then
+        if [ -n "$add" ]; then
+            /scripts-base/installExtraBuild.sh $add $add_dev
         fi
     fi
 }
 
 executePurgue() {
-    if [ $1 == true ]; then
-        service="del"
-        eval dependencies=\$$service
-        if [ ${#dependencies} -gt 0 ]; then
-            if [ $2 == true ]; then
-                /scripts-base/deleteExtraBuild.sh $dependencies
-            fi
-            if [ $3 == true ]; then
-                /scripts-base/deleteDevBuild.sh $dependencies
-            fi
-        else
-            echo "Dependencies doesn't available"
+    local is_purgue=$1
+
+    if [ $is_purgue == true ]; then
+        if [ -n "$del" ]; then
+            /scripts-base/deleteExtraBuild.sh $del $del_dev
         fi
     fi
 }
@@ -63,7 +46,6 @@ then
 fi
 
 develop=false
-production=false
 purgue=false
 
 for i in "$@"
@@ -71,12 +53,11 @@ do
     case $i in
         --develop)
         develop=true
-        production=false
         shift
         ;;
         --production)
+        # --production kept for backward-compatibility reasons. It is really not needed anymore.
         develop=false
-        production=true
         shift
         ;;
         -i|--install)
@@ -92,8 +73,6 @@ do
     esac
 done
 
-chargeProductionListDependencies $production
-chargeDevelopListDependencies $develop
-
-executeInstall $install $production $develop
-executePurgue $purgue $production $develop
+chargeListDependencies $develop
+executeInstall $install
+executePurgue $purgue

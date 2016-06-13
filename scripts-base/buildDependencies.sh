@@ -3,10 +3,12 @@
 InstallationDir="${InstallationDir:-/var/service}"
 
 usage() {
-    echo "$0 [--develop|--production] [-i|--install] [-p|--purgue]"
+    echo "$0 [--develop|--production] [-i|--install] [-p|--purgue] [--] [COMMAND [ARG..]]"
     echo " --develop, --production: type of script to use in the install or purgue, environment develop or production"
     echo " -i, --install:           install packages"
     echo " -p, --purgue:            purgue packages"
+    echo ""
+    echo "If supplied, it will exec COMMAND [ARG..] when finished installing/removing packages"
 }
 
 chargeListDependencies() {
@@ -70,9 +72,22 @@ do
         purgue=true
         shift
         ;;
+        --)
+        shift
+        break
+        ;;
+        *)
+        # we don't recognize this parameter, it may be the command to execute. So stop parsing params
+        # AND do not consume this one.
+        break
+        ;;
     esac
 done
 
 chargeListDependencies $develop
 executeInstall $install
 executePurgue $purgue
+
+if [ "$#" -gt 0 ]; then
+    exec "$@"
+fi

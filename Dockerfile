@@ -6,7 +6,6 @@ COPY scripts-base/*.sh scripts-base/dependencies.list /scripts-base/
 COPY scripts-base/alpine-*.list ${BaseInstallationDir}/
 
 RUN chmod +x scripts-base/* && \
-    apk update && \
     scripts-base/buildDependencies.sh --production --install && \
     echo -e '#!/bin/ash\n ash "$@"' > /bin/bash && chmod +x /bin/bash && \
     npm install -g eyeos-run-server && \

@@ -19,6 +19,8 @@ chargeListDependencies() {
     if [ $is_develop == true ]; then
         source "$InstallationDir"/alpine-dependencies-dev.list
     fi
+
+    apk update
 }
 
 executeInstall() {
